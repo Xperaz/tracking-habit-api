@@ -1,5 +1,5 @@
 {
-  "name": "api-design-v5",
+  "name": "habit-tracker-api",
   "version": "1.0.0",
   "description": "Habit Tracker API for Node.js course",
   "main": "src/index.ts",
