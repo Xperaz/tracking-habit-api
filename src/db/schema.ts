@@ -9,7 +9,6 @@ import {
 } from 'drizzle-orm/pg-core'
 
 import { relations } from 'drizzle-orm'
-import { id } from 'zod/locales'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 
 export const users = pgTable('users', {
@@ -26,7 +25,7 @@ export const users = pgTable('users', {
 })
 
 export const habits = pgTable('habits', {
-  id: uuid('is').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id')
     .references(() => users.id, { onDelete: 'cascade' })
     .notNull(),
@@ -58,7 +57,7 @@ export const tags = pgTable('tags', {
 })
 
 export const habitTags = pgTable('habitTags', {
-  id: uuid('is').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().defaultRandom(),
   habitId: uuid('habit_id').references(() => habits.id, {
     onDelete: 'cascade',
   }),
@@ -104,6 +103,7 @@ export const habitTagsRelations = relations(habitTags, ({ one }) => ({
 }))
 
 export type User = typeof users.$inferSelect
+export type NewUser = typeof users.$inferInsert
 export type Habit = typeof habits.$inferSelect
 export type Entry = typeof entries.$inferSelect
 export type Tag = typeof tags.$inferSelect
