@@ -36,7 +36,6 @@ try {
   env = envSchema.parse(process.env)
 } catch (e) {
   if (e instanceof z.ZodError) {
-    console.log('Invalid env var')
     console.error(JSON.stringify(e.flatten().fieldErrors, null, 2))
 
     e.issues.forEach((err) => {

@@ -3,7 +3,8 @@ import bcrypt from 'bcrypt'
 import { db } from '../db/connection.ts'
 import { users, type NewUser, type User } from '../db/schema.ts'
 import { generateToken } from '../utils/jwt.ts'
-import { hashPassword } from '../utils/passwords.ts'
+import { comparePasswords, hashPassword } from '../utils/passwords.ts'
+import { eq } from 'drizzle-orm'
 
 export const register = async (
   req: Request<any, any, NewUser>,
@@ -32,14 +33,54 @@ export const register = async (
       username: user.username,
     })
 
-    console.log('User registered:', user)
-    console.log('Generated token:', token)
     res
       .status(201)
       .json({ message: 'User registered successfully', user, token })
   } catch (error) {
     console.error('Registration error:', error)
     res.status(500).json({ error: 'Failed to create user' })
+    return
+  }
+}
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body
+    const user = await db.query.users.findFirst({
+      where: eq(email, users.email),
+    })
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid email or password' })
+    }
+
+    const isValidPassword = await comparePasswords(password, user.password)
+
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid email or password' })
+    }
+
+    const token = await generateToken({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+    })
+
+    return res.status(201).json({
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        createdAt: user.createdAt,
+      },
+      token,
+    })
+  } catch (error) {
+    console.error('Login error:', error)
+    res.status(500).json({ error: 'Failed to login' })
     return
   }
 }
