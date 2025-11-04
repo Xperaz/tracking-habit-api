@@ -5,8 +5,8 @@ import userRoutes from './routes/userRoutes.ts'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
-import { skip } from 'node:test'
 import { isTest } from '../env.ts'
+import { authenticateToken } from './middleware/auth.ts'
 
 const app = express()
 app.use(helmet())
