@@ -7,6 +7,7 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 import { isTest } from '../env.ts'
 import { authenticateToken } from './middleware/auth.ts'
+import { APIError, errorHandler } from './middleware/errorHandler.ts'
 
 const app = express()
 app.use(helmet())
@@ -23,9 +24,15 @@ app.get('/health', (req, res) => {
   res.json({ message: 'Server is healthy' }).status(200)
 })
 
+app.use((_, __, next) => {
+  next(new APIError('validation error', 'ValidationError', 400))
+})
+
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/habits', habitRoutes)
+
+app.use(errorHandler)
 
 export { app }
 
