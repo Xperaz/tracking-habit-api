@@ -2,6 +2,7 @@ import express from 'express'
 import authRoutes from './routes/authRoutes.ts'
 import habitRoutes from './routes/habitRoutes.ts'
 import userRoutes from './routes/userRoutes.ts'
+import tagRoutes from './routes/tagRoutes.ts'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
@@ -24,13 +25,10 @@ app.get('/health', (req, res) => {
   res.json({ message: 'Server is healthy' }).status(200)
 })
 
-app.use((_, __, next) => {
-  next(new APIError('validation error', 'ValidationError', 400))
-})
-
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/habits', habitRoutes)
+app.use('/api/tags', tagRoutes)
 
 app.use(errorHandler)
 

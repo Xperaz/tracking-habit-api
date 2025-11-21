@@ -1,4 +1,4 @@
-import type { Response } from 'express'
+import { type Response } from 'express'
 import type { AuthenticatedRequest } from '../middleware/auth.ts'
 import { db } from '../db/connection.ts'
 import { habits, entries, habitTags, tags } from '../db/schema.ts'
@@ -111,5 +111,55 @@ export const updateHabit = async (req: AuthenticatedRequest, res: Response) => {
   } catch (error) {
     console.error('update habit error: ', error)
     res.status(500).json({ message: 'Failed to update habit' })
+  }
+}
+
+export const deleteHabit = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const id = req.params.id
+    const userId = req.user!.id
+
+    const [habit] = await db
+      .delete(habits)
+      .where(and(eq(habits.id, id), eq(habits.userId, userId)))
+      .returning()
+
+    if (!habit) {
+      return res.status(404).json({ message: 'habit not found' })
+    }
+
+    return res.status(200).json({ message: 'habit successfully deleted' })
+  } catch (error) {
+    console.error(`error deleting habit: `, error)
+    return res.status(500).json({ message: 'Failed to delete habit' })
+  }
+}
+
+export const getHabitById = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  try {
+    const id = req.params.id
+    if (!id) {
+      return res.status(400).json({ message: 'Habit ID is required' })
+    }
+    const habit = await db.query.habits.findFirst({
+      where: eq(habits.id, id),
+      with: {
+        habitTags: {
+          with: {
+            tag: true,
+          },
+        },
+      },
+    })
+
+    res.status(200).json({
+      habit,
+    })
+  } catch (error) {
+    console.error('get habit by id error: ', error)
+    res.status(500).json({ message: 'Failed to get habit by id' })
   }
 }

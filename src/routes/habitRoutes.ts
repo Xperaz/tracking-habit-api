@@ -4,6 +4,8 @@ import { object, z } from 'zod'
 import { authenticateToken } from '../middleware/auth.ts'
 import {
   createHabit,
+  deleteHabit,
+  getHabitById,
   getUserHabits,
   updateHabit,
 } from '../controllers/habitController.ts'
@@ -24,7 +26,7 @@ const updateHabitSchema = z.object({
   tagIds: z.array(z.string()).optional(),
 })
 
-const completeParamsSchema = z.object({
+const uuidSchema = z.object({
   id: z.string(),
 })
 
@@ -34,20 +36,22 @@ router.use(authenticateToken)
 
 router.get('/', getUserHabits)
 
-router.get('/:id', (req, res) => {
-  res.json({ message: `get habit with id: ${req.params.id}` })
-})
+router.get('/:id', validateParams(uuidSchema), getHabitById)
 
 router.post('/', validateBody(createHabitSchema), createHabit)
-router.patch('/:id', validateBody(updateHabitSchema), updateHabit)
 
-router.delete('/:id', (req, res) => {
-  res.json({ message: `delete habit with id: ${req.params.id}` }).status(202)
-})
+router.patch(
+  '/:id',
+  validateParams(uuidSchema),
+  validateBody(updateHabitSchema),
+  updateHabit
+)
+
+router.delete('/:id', validateParams(uuidSchema), deleteHabit)
 
 router.post(
   '/:id/complete',
-  validateParams(completeParamsSchema),
+  validateParams(uuidSchema),
   validateBody(createHabitSchema),
   (req, res) => {
     res.json({ message: `complete habit: ${req.params.id}` }).status(201)
