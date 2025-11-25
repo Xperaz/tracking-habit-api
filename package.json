@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "node --watch src/index.ts",
     "start": "node src/index.ts",
-    "test": "vitest run",
+    "test:unit": "vitest --config vitest.unit.config.js",
+    "test:integration": "vitest --config vitest.integration.config.js",
+    "test": "npm run test:unit && npm run test:integration",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "db:generate": "drizzle-kit generate",

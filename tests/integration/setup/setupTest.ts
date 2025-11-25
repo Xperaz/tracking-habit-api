@@ -24,5 +24,7 @@ export default async function setup() {
       `npx drizzle-kit push --url="${process.env.DATABASE_URL}" --schema="../../../src/db/schema.ts" --dialect="postgresql"`,
       { stdio: 'inherit' }
     )
-  } catch (error) {}
+  } catch (error) {
+    console.error('DB setup failed:', error)
+  }
 }
