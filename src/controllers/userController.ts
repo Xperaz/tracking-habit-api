@@ -10,7 +10,7 @@ export const getAllUsers = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { password, ...rest } = getTableColumns(users)
     const allUsers = await db.select({ ...rest }).from(users)
-    if (!users) {
+    if (!allUsers || allUsers.length === 0) {
       return res.status(404).json({ message: 'not users found!' })
     }
 
