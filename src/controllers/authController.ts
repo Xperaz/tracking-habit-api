@@ -1,5 +1,4 @@
 import type { Request, Response } from 'express'
-import bcrypt from 'bcrypt'
 import { db } from '../db/connection.ts'
 import { users, type NewUser, type User } from '../db/schema.ts'
 import { generateToken } from '../utils/jwt.ts'
@@ -47,7 +46,7 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body
     const user = await db.query.users.findFirst({
-      where: eq(email, users.email),
+      where: eq(users.email, email),
     })
 
     if (!user) {
@@ -66,7 +65,7 @@ export const login = async (req: Request, res: Response) => {
       username: user.username,
     })
 
-    return res.status(201).json({
+    return res.status(200).json({
       message: 'Login successful',
       user: {
         id: user.id,
